@@ -675,6 +675,12 @@ sendToIdP(OM_uint32 *minor, xmlDocPtr doc, char *idp,
         major = GSS_S_FAILURE;
     }
 
+    // set content-type
+    struct curl_slist *content_header = NULL;
+    content_header = curl_slist_append(content_header, "PAOS: ver=\"urn:liberty:paos:2003-08\";\"urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp\"");
+    content_header = curl_slist_append(content_header, "Accept: application/vnd.paos+xml");
+    content_header = curl_slist_append(content_header, "Content-Type: text/xml");
+
     if ((res = curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, curl_err_msg)) != CURLE_OK ||
         (res = curl_easy_setopt(curl, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS)) != CURLE_OK ||
         (res = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0)) != CURLE_OK ||
@@ -694,6 +700,7 @@ sendToIdP(OM_uint32 *minor, xmlDocPtr doc, char *idp,
                       (res = curl_easy_setopt(curl, CURLOPT_KEYPASSWD, "")) != CURLE_OK)) ||
         (res = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1)) != CURLE_OK ||
         (res = curl_easy_setopt(curl, CURLOPT_POST, 1)) != CURLE_OK ||
+        (res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, content_header)) != CURLE_OK ||
         (res = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, mem)) != CURLE_OK ||
         (res = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, size)) != CURLE_OK ||
         (res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, response)) != CURLE_OK ||
